@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Tutorial: Hello Dojo!</title>
+</head>
+<body>
+    <h1 id="greeting">Hello</h1>
+    <h3 id="data">data</h3>
+    <!-- load Dojo -->
+    <script src="../dojo/dojo.js"
+            data-dojo-config="async: true"></script>
+
+    <script>
+      // Require the module we just created
+      require(["test/myModule"], function(myModule){
+        // Use our module to change the text in the greeting
+        myModule.setText("greeting", "Hello Dojo!");
+ 
+        // After a few seconds, restore the text to its original state
+        setTimeout(function(){
+          myModule.restoreText("greeting");
+        }, 3000);
+      });
+
+    </script>
+
+    <!-- create the chart -->
+    <div id="chartNode" style="width: 550px; height: 550px;"></div>
+    
+    <!-- load dojo and provide config via data attribute -->
+   
+    <script>
+      
+      // x and y coordinates used for easy understanding of where they should display
+      // Data represents website visits over a week period
+      chartData = [
+      { x: 1, y: 19021 },
+      { x: 1, y: 12837 },
+      { x: 1, y: 12378 },
+      { x: 1, y: 21882 },
+      { x: 1, y: 17654 },
+      { x: 1, y: 15833 },
+      { x: 1, y: 16122 }
+      ];
+      
+      require([
+        // Require the basic 2d chart resource
+        "dojox/charting/Chart",
+      
+        // Require the theme of our choosing
+        "dojox/charting/themes/Claro",
+
+        // Store interfaces:
+        "dojo/store/Observable",
+        "dojo/store/CouchdbStore",
+      
+        // Charting plugins: 
+      
+        // 	Require the Pie type of Plot 
+        "dojox/charting/plot2d/Pie",
+        "dojox/charting/StoreSeries",
+      
+        // My Module
+        "test/myModule",
+      
+        // Wait until the DOM is ready
+        "dojo/domReady!"
+      ], function(Chart, theme, Observable, CouchdbStore, PiePlot, StoreSeries, myModule){
+      
+      // Create the chart within it's "holding" node
+      var pieChart = new Chart("chartNode");
+      
+      // Set the theme
+      pieChart.setTheme(theme);
+      
+      // Add the only/default plot 
+      pieChart.addPlot("default", {
+      type: PiePlot, // our plot2d/Pie module reference as type value
+      radius: 200,
+      fontColor: "black",
+      labelOffset: -20
+      });
+
+      // create a dataztore from the FULL couchdb database
+      var store = new Observable( new CouchdbStore({
+        target: "http://localhost:5984/fake_results_2013_06_13t10_37_07_782936/_design/javier_test/_view/gitcode_means"
+      }));
+      
+      // Add the series of data
+      //pieChart.addSeries("January",chartData);
+      pieChart.addSeries( "y", 
+        new StoreSeries( store, { query: { startkey: 49} }, "value" ) );
+
+      store.query( { startkey: 50 } ).then(function(results) {
+        myModule.setText( "data", dojo.toJson( results) );
+        console.log( "set data" );
+      });
+      
+      // Render the chart!
+      pieChart.render();
+      
+      });
+    </script>
+</body>
+</html>
