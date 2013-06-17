@@ -1,8 +1,8 @@
 experimental-results-ui
 =======================
 
-Quickstart:
------------
+Getting couchdb running:
+------------------------
 
 To get the UI running and test it:
 
@@ -15,14 +15,20 @@ To get the UI running and test it:
     cd build-couchdb/
     
     rake
+    
+    git clone git@github.com:josh00/experimental-results-framework-couchdb.git
+    
+    setup build-couchdb/builb/etc/couchdb/local.ini as described in the repo's README.md
 
 Start up (and leave running) couch db
 
-    build/bin/couchdb
+    build-couchdb/build/bin/couchdb
+    
 
-Download jetty and dojo
-
-Copy the contents of dojo-release-*-src into jetty-distribution-*/webapps/
+Generating fake results:
+------------------------
+    
+Put fake results into the database
 
     git clone git@github.com:josh00/experimental-results-framework.git
 
@@ -30,18 +36,28 @@ Copy the contents of dojo-release-*-src into jetty-distribution-*/webapps/
 
     python generate_fake_results.py --num-trials 200
     
+Starting up jetty:
+------------------
+
+Download jetty
+    
 cd into jetty-distribution-* and start the server 
 
     java -jar start.jar
+    
+    
+Setting up dojo:
+----------------
 
+Make a new directory in jetty-distribution-*/webapps/ called NAME
 
-jetty directory structure:
---------------------------
+Download dojo
 
-    jetty-distribution-*/webapps/
+Copy the contents of dojo-release-*-src/ into jetty-distribution-*/webapps/NAME/
+
+The directory structure should look like:
+
+    jetty-distribution-*/webapps/NAME/
         dojo/
         dojox/
         ... (other dojo folders)
-        test/
-            mymodule.ss
-            test.html
