@@ -16,9 +16,7 @@ To get the UI running and test it:
     
     rake
     
-    git clone git@github.com:josh00/experimental-results-framework-couchdb.git
-    
-    setup build-couchdb/builb/etc/couchdb/local.ini as described in the repo's README.md
+    setup build-couchdb/builb/etc/couchdb/local.ini as described in the README.md of github.com/josh00/experimental-results-framework-couchdb
 
 Start up (and leave running) couch db
 
@@ -61,3 +59,16 @@ The directory structure should look like:
         dojo/
         dojox/
         ... (other dojo folders)
+
+Running Javier test UI:
+-----------------------
+
+        git clone git@github.com:josh00/experimental-results-ui.git
+        
+        cp -r experimental-results-ui/dojo_addons/dojo/ jetty-distribution-*/webapps/NAME/
+        
+        cp -r experimental-results-ui/javier_test/ jetty-distribution-*/webapps/NAME/
+        
+        git clone git@github.com:josh00/experimental-results-framework-couchdb.git
+        
+        
