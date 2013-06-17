@@ -38,3 +38,10 @@ cd into jetty-distribution-* and start the server
 jetty directory structure:
 --------------------------
 
+    jetty-distribution-*/webapps/
+        dojo
+        dojox
+        ... (other dojo folders)
+        test/
+            mymodule.ss
+            test.html
