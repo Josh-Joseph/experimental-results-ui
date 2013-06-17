@@ -1,6 +1,8 @@
 experimental-results-ui
 =======================
 
+This repo includes all of the html and javascript that is run on the client-side of the UI. This does not include the couchdb views but uses them.
+
 Getting couchdb running:
 ------------------------
 
