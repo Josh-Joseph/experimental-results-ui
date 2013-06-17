@@ -75,4 +75,7 @@ Running Javier test UI:
         
         git clone git@github.com:josh00/experimental-results-framework-couchdb.git
         
+        MORE FILLED IN HERE
+        
+To view the results, open a browser and go to localhost:8080/NAME/javier_test/test.html
         
