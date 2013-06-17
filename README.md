@@ -1,6 +1,9 @@
 experimental-results-ui
 =======================
 
+Quickstart:
+-----------
+
 To get the UI running and test it:
 
     sudo apt-get install help2man make gcc zlib1g-dev libssl-dev rake help2man texinfo flex dctrl-tools libsctp-dev libxslt1-dev libcap2-bin ed
@@ -30,3 +33,8 @@ Copy the contents of dojo-release-*-src into jetty-distribution-*/webapps/
 cd into jetty-distribution-* and start the server 
 
     java -jar start.jar
+
+
+jetty directory structure:
+--------------------------
+
