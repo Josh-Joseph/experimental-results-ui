@@ -18,7 +18,7 @@ To get the UI running and test it:
     
     rake
     
-    setup build-couchdb/builb/etc/couchdb/local.ini as described in the README.md of github.com/josh00/experimental-results-framework-couchdb
+    setup build-couchdb/builb/etc/couchdb/local.ini as described in the README.md [here](https://github.com/josh00/experimental-results-framework-couchdb)
 
 Start up (and leave running) couch db
 
@@ -35,6 +35,8 @@ Put fake results into the database
     cd experimental-results-framework/fake-results-generator/
 
     python generate_fake_results.py --num-trials 200
+    
+To view the fake results, in a browser open http://localhost:5984/_utils/
     
 Starting up jetty:
 ------------------
