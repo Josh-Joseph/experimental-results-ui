@@ -39,8 +39,8 @@ jetty directory structure:
 --------------------------
 
     jetty-distribution-*/webapps/
-        dojo
-        dojox
+        dojo/
+        dojox/
         ... (other dojo folders)
         test/
             mymodule.ss
