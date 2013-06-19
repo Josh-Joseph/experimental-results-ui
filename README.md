@@ -78,4 +78,8 @@ Running Javier test UI:
         MORE FILLED IN HERE
         
 To view the results, open a browser and go to localhost:8080/NAME/javier_test/test.html
-        
+
+
+License:
+-------
+This module is distrubted under the MIT license.
