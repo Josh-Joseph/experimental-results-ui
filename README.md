@@ -75,7 +75,9 @@ Running Javier test UI:
         
         git clone git@github.com:josh00/experimental-results-framework-couchdb.git
         
-        MORE FILLED IN HERE
+Load the couchdb design documents
+        
+        python experimental-results-framework-couchdb/load-design-document.py --recursive --autodetect-database-from-directory-structure couchdb-design-documents/
         
 To view the results, open a browser and go to localhost:8080/NAME/javier_test/test.html
 
