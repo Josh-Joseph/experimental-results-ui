@@ -68,6 +68,7 @@
 <body class="claro">
     <div id="appLayout" class="demoLayout"></div>
     
+    
     <script>
       require(["dijit/registry", 
                "dijit/layout/BorderContainer",
@@ -76,9 +77,12 @@
                "dojo/io-query",
                "dojo/store/Observable",
                "dojo/store/CouchdbStore",
+               "dgrid/OnDemandList",
+               "put-selector/put",
                "dojo/domReady!"],
       function(registry, BorderContainer, TabContainer, 
-               ContentPane, ioQuery, Observable, CouchdbStore ){
+               ContentPane, ioQuery, Observable, CouchdbStore,
+               OnDemandList, put ){
 
       // grab all known clsuters into a store
       
@@ -102,22 +106,60 @@
         // now, ask for the jobs for this cluster and list them out
         var c = dojo.toJson( row ) + "<br><br>"
 	var contentPane = new ContentPane({
-          title: "cluster: " + row.value.cluster.hostname,
-          content: c
+          content: c,
+          region: "center"
         });
 
-	jobs_store_by_cluster.query( { key: dojo.toJson(row.value.cluster.cluster_id) } ).forEach(function( job_row ) {
-	  console.log( "Got job: " + dojo.toJson( job_row ) );
-
-          c += "<li><h3>" + job_row.value.job.status + "</h3>";
-	  c += "<h4>" + job_row.value.job.script + "</h4>";
-	  c += "\n";
-	  contentPane.set( 'content', c );
+        // Note: this happen async, so it will really happen after the rest of 
+        //       this function finished (usually)
+	//jobs_store_by_cluster.query( { key: dojo.toJson(row.value.cluster.cluster_id) } ).forEach(function( job_row ) {
+	//  console.log( "Got job: " + dojo.toJson( job_row ) );
+        //  c += "<li><h3>" + job_row.value.job.status + "</h3>";
+	//  c += "<h4>" + job_row.value.job.script + "</h4>";
+	//  c += "\n";
+	//  contentPane.set( 'content', c );
+	//});
+	
+	// create a new border container
+	var container = new BorderContainer({
+	  design: "headline",
+	title: "cluster: " + row.value.cluster.hostname
 	});
 	
+	// create an OnDemanList for hte jobs
+	var job_list = new OnDemandList({
+	  store: jobs_store_by_cluster,
+	  query: "?key=" + dojo.toJson(row.value.cluster.cluster_id),
+	  region: "left",
+          "class": "edgePanel",
+          splitter: true,
+	  renderRow: function( object, options ) {
+	    return put( "div", object.value.job.status + " :: " + object.value.job.script );
+	  }
+	});
+	
+	var job_list_pane = new ContentPane({
+	  region: "left",
+	  "class": "edgePanel",
+	  splitter: true
+	});
+	job_list_pane.addChild( job_list );
+
+	// add content pane and list to container 
+	container.addChild( new ContentPane({
+	  region: "top",
+	  "class": "edgePanel",
+	  content: "Some Header"
+	}));
+	container.addChild( job_list_pane );
+	container.addChild( contentPane );
       
-        // add the content pane
-        tabContainer.addChild( contentPane );
+        // add the container to tab
+        tabContainer.addChild( container );
+	
+	// refrech th job list
+	//console.log( "job_list.query: " + dojo.toJson( job_list.query ) );
+	job_list.refresh();
       });
       
       });

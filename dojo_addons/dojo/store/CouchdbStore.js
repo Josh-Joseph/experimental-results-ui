@@ -70,6 +70,7 @@ return declare("dojo.store.CouchdbStore", base, {
 		//		used to provide HTTP headers instead.
 		// returns: Object
 		//		The object in the store that matches the given id.
+   	        console.log( "CouchdbStore::get(" + id + ") called!" ); 
 		options = options || {};
 		var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers || options);
 	        var res = xhr("GET", {
@@ -96,6 +97,7 @@ return declare("dojo.store.CouchdbStore", base, {
 	put: function(object, options){
                 // TODO: implement this
 	        //       right now this is WRONG (just copied from JsonRest)
+	    console.log( "CouchdbStore::put called!" );
             throw "CouchdbStore::put NOT IMPLEMENTED";
 		// summary:
 		//		Stores an object. This will trigger a PUT request to the server
@@ -125,6 +127,7 @@ return declare("dojo.store.CouchdbStore", base, {
 	add: function(object, options){
 	        // TODO: implement this
 	        //       right now this is WRONG (just copied from JsonRest)
+	    console.log( "CouchdbStore::add called!" );
             throw "CouchdbStore::add NOT IMPLEMENTED";
 
 		// summary:
@@ -171,17 +174,31 @@ return declare("dojo.store.CouchdbStore", base, {
 		options = options || {};
 
 		var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers);
-
-		if(options.start >= 0 || options.count >= 0){
-			headers.Range = headers["X-Range"] //set X-Range for Opera since it blocks "Range" header
-				 = "items=" + (options.start || '0') + '-' +
-				(("count" in options && options.count != Infinity) ?
-					(options.count + (options.start || 0) - 1) : '');
-		}
 		var hasQuestionMark = this.target.indexOf("?") > -1;
+   	        if( hasQuestionMark == false && typeof query == "string") {
+		    hasQuestionMark = query.indexOf("?") > -1;
+		}
+	          
+		if(options.start >= 0 || options.count >= 0){
+			// headers.Range = headers["X-Range"] //set X-Range for Opera since it blocks "Range" header
+			// 	 = "items=" + (options.start || '0') + '-' +
+			// 	(("count" in options && options.count != Infinity) ?
+			// 		(options.count + (options.start || 0) - 1) : '');
+		    if( options.start >= 0 ) {
+			query += (hasQuestionMark ? "&" : "?") + "skip=" + encodeURIComponent(options.start);
+			hasQuestionMark = true;
+		    }
+		    if( options.count >= 0 ){
+			query += (hasQuestionMark ? "&" : "?") + "limit=" + encodeURIComponent(options.count);
+			hasQuestionMark = true
+		    }
+		}
 		if(query && typeof query == "object"){
+		        //console.log( "obj->query: " + dojo.toJson(query) );
 			query = xhr.objectToQuery(query);
+		        //console.log( "  -->" + query );
 			query = query ? (hasQuestionMark ? "&" : "?") + query: "";
+		    hasQuestionMark = true;
 		}
 		if(options && options.sort){
 			var sortParam = this.sortParam;
