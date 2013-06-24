@@ -1,120 +1,133 @@
 <head>
     <link rel="stylesheet" href="style.css" media="screen">
+    <link rel="stylesheet" href="../pretty-json/css/pretty-json.css" media="screen">
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.0/dijit/themes/claro/claro.css" media="screen">
+    <script src="../pretty-json/jquery-1.8.3.min.js">
+    </script>
+    <script src="../pretty-json/underscore-min.js">
+    </script>
+    <script src="../pretty-json/backbone-min.js">
+    </script>
+    <script src="../pretty-json/pretty-json-min.js">
+    </script>
+
     <script src="../dojo/dojo.js"
         data-dojo-config="async:1">
     </script>
-    <script>
+    <script language="javascript">
     require(["dijit/registry", 
-             "dijit/layout/BorderContainer",
-             "dijit/layout/TabContainer", 
-             "dijit/layout/ContentPane", 
-             "dojo/io-query",
-             "dojo/domReady!"],
-        function(registry, BorderContainer, TabContainer, ContentPane, ioQuery){
-
-    // create the main bordercontainer layout panel
-    // attached to the appLayout DIV
-    var appLayout = new BorderContainer({
-      design : "headline"
-    }, "appLayout" );
-    
-    
-    // create the tab container
-    var contentTabs = new TabContainer({
-      region: "center",
-      id: "contentTabs",
-      tabPosition: "bottom",
-      "class": "centerPanel"
-    });
-    
-    // add the tab container to the appLayout
-    appLayout.addChild( contentTabs );
-    
-    // add the header top and edge panels
-    appLayout.addChild( 
-      new ContentPane({
-        region: "top",
-        "class": "edgePanel",
-        content: "Header Content (top)"
-    }));
-    
-    appLayout.addChild(
-      new ContentPane({
-        region: "left",
-        id: "leftCol",
-        "class": "edgePanel",
-        splitter: true,
-        content: "Sidebar content (left)"
-    }));
-
-    // add initial tab
-    var query_string = ""
-    if( window.location.href.indexOf("?") >= 0 ) {
-      query_string = window.location.href.substr( window.location.href.indexOf("?") + 1 );
-    }
-    contentTabs.addChild(
-      new ContentPane({
-        content: "href = " + window.location.href + "<br><br>Query JSON:" + dojo.toJson(ioQuery.queryToObject(query_string)),
-        title: "Arguments"
-    }));
-
-    // start up anbd do layout
-    appLayout.startup();
-
-        });
+	     "dijit/layout/BorderContainer",
+	     "dijit/layout/TabContainer", 
+	     "dijit/layout/ContentPane", 
+	     "dojo/io-query",
+	     "dojo/domReady!"],
+	  
+    function(registry, BorderContainer, TabContainer, ContentPane, ioQuery){
+	  
+      // create the main bordercontainer layout panel
+      // attached to the appLayout DIV
+      var appLayout = new BorderContainer({
+	design : "headline"
+      }, "appLayout" );
+      
+      
+      // create the tab container
+      var contentTabs = new TabContainer({
+	region: "center",
+	id: "contentTabs",
+	tabPosition: "bottom",
+	"class": "centerPanel"
+      });
+      
+      // add the tab container to the appLayout
+      appLayout.addChild( contentTabs );
+      
+      // add the header top and edge panels
+      appLayout.addChild( 
+	new ContentPane({
+	  region: "top",
+	  "class": "edgePanel",
+	  content: "Header Content (top)"
+	}));
+      
+      appLayout.addChild(
+	new ContentPane({
+	  region: "left",
+	  id: "leftCol",
+	  "class": "edgePanel",
+	  splitter: true,
+	  content: "Sidebar content (left)"
+	}));
+      
+      // add initial tab
+      var query_string = ""
+      if( window.location.href.indexOf("?") >= 0 ) {
+	query_string = window.location.href.substr( window.location.href.indexOf("?") + 1 );
+      }
+      contentTabs.addChild(
+	new ContentPane({
+	  content: "href = " + window.location.href + "<br><br>Query JSON:" + dojo.toJson(ioQuery.queryToObject(query_string)),
+	  title: "Arguments"
+	}));
+      
+      // start up anbd do layout
+      appLayout.startup();
+      
+      });
     </script>
 </head>
 <body class="claro">
-    <div id="appLayout" class="demoLayout"></div>
-    
-    
-    <script>
-      require(["dijit/registry", 
-               "dijit/layout/BorderContainer",
-               "dijit/layout/TabContainer", 
-               "dijit/layout/ContentPane", 
-               "dojo/io-query",
-               "dojo/store/Observable",
-               "dojo/store/CouchdbStore",
-               "dgrid/OnDemandList",
-               "put-selector/put",
-               "dojo/domReady!"],
-      function(registry, BorderContainer, TabContainer, 
-               ContentPane, ioQuery, Observable, CouchdbStore,
-               OnDemandList, put ){
-
+  <div id="appLayout" class="demoLayout"></div>
+  
+  
+  <script language="javascript">
+    require(["dijit/registry", 
+	     "dijit/layout/BorderContainer",
+	     "dijit/layout/TabContainer", 
+	     "dijit/layout/ContentPane", 
+	     "dojo/io-query",
+	     "dojo/store/Observable",
+	     "dojo/store/CouchdbStore",
+	     "dgrid/OnDemandList",
+	     "put-selector/put",
+	     "dojo/request",
+	     "dojo/dom-construct",
+	     "dojo/domReady!"],
+    function(registry, BorderContainer, TabContainer, 
+	     ContentPane, ioQuery, Observable, CouchdbStore,
+	     OnDemandList, put, request, domConstruct ){
+      
       // grab all known clsuters into a store
       
       // create a dataztore from the clusters couchdb database
       var store = new Observable( new CouchdbStore({
-        target: "http://localhost:5984/clusters/_design/ui/_view/all"
+	target: "http://localhost:5984/clusters/_design/ui/_view/all"
       }));
-
+      
       // create a datastore for hte jobs database view by clsuter id
       var jobs_store_by_cluster = new Observable( new CouchdbStore({
-        target: "http://localhost:5984/jobs/_design/ui/_view/by_cluster_id"
+	target: "http://localhost:5984/jobs/_design/ui/_view/by_cluster_id"
       }));
-
+      
       // get the tab container
       var tabContainer = registry.byId("contentTabs");
-
+      
       // for every known clsuter, create a new tab
       store.query({ startKey: {} }).forEach(function(row){
-        
-      
-        // now, ask for the jobs for this cluster and list them out
-        var c = dojo.toJson( row ) + "<br><br>"
+	
+	
+	// now, ask for the jobs for this cluster and list them out
+	var c = dojo.toJson( row ) + "<br><br>"
 	var contentPane = new ContentPane({
-          content: c,
-          region: "center"
-        });
-
-        // Note: this happen async, so it will really happen after the rest of 
-        //       this function finished (usually)
+	  content: c,
+	  region: "center"
+	});
+	
+	// Note: this happen async, so it will really happen after the rest of 
+	//       this function finished (usually)
 	//jobs_store_by_cluster.query( { key: dojo.toJson(row.value.cluster.cluster_id) } ).forEach(function( job_row ) {
 	//  console.log( "Got job: " + dojo.toJson( job_row ) );
-        //  c += "<li><h3>" + job_row.value.job.status + "</h3>";
+	//  c += "<li><h3>" + job_row.value.job.status + "</h3>";
 	//  c += "<h4>" + job_row.value.job.script + "</h4>";
 	//  c += "\n";
 	//  contentPane.set( 'content', c );
@@ -123,7 +136,7 @@
 	// create a new border container
 	var container = new BorderContainer({
 	  design: "headline",
-	title: "cluster: " + row.value.cluster.hostname
+	  title: "cluster: " + row.value.cluster.hostname
 	});
 	
 	// create an OnDemanList for hte jobs
@@ -131,11 +144,28 @@
 	  store: jobs_store_by_cluster,
 	  query: "?key=" + dojo.toJson(row.value.cluster.cluster_id),
 	  region: "left",
-          "class": "edgePanel",
-          splitter: true,
+	  "class": "edgePanel",
+	  splitter: true,
 	  renderRow: function( object, options ) {
 	    return put( "div", object.value.job.status + " :: " + object.value.job.script );
 	  }
+	});
+
+	// Ok, we want to hook up an event listener to this new list
+	// which handles clicking on a row to log the 
+	// json object clicked on (the job)
+	job_list.on( ".dgrid-row:click", function(evt) {
+	  var row = job_list.row( evt );
+	  //console.log( "Clicked on row, data: " + dojo.toJson( row.data ) );
+	  //console.log( "Clicked on row, id: " + dojo.toJson( row.id ) );
+	  
+	  // row.data contains the actual couchdb job document from hte store!
+	  
+	  // set the centeral pane content to the job document clicked on
+	  var pretty_json_node = new PrettyJSON.view.Node({
+	    el: contentPane.domNode,
+	    data: row.data.value
+	  });
 	});
 	
 	var job_list_pane = new ContentPane({
@@ -144,7 +174,7 @@
 	  splitter: true
 	});
 	job_list_pane.addChild( job_list );
-
+	
 	// add content pane and list to container 
 	container.addChild( new ContentPane({
 	  region: "top",
@@ -153,15 +183,15 @@
 	}));
 	container.addChild( job_list_pane );
 	container.addChild( contentPane );
-      
-        // add the container to tab
-        tabContainer.addChild( container );
+	
+	// add the container to tab
+	tabContainer.addChild( container );
 	
 	// refrech th job list
 	//console.log( "job_list.query: " + dojo.toJson( job_list.query ) );
 	job_list.refresh();
       });
       
-      });
-    </script>
+    });
+  </script>
 </body>
