@@ -85,6 +85,10 @@
 	     "dijit/layout/BorderContainer",
 	     "dijit/layout/TabContainer", 
 	     "dijit/layout/ContentPane", 
+	     "dijit/form/Button",
+	     "dijit/form/TextBox",
+	     "dijit/form/NumberTextBox",
+	     "dojo/dom-style",
 	     "dojo/io-query",
 	     "dojo/store/Observable",
 	     "dojo/store/CouchdbStore",
@@ -94,7 +98,8 @@
 	     "dojo/dom-construct",
 	     "dojo/domReady!"],
     function(registry, BorderContainer, TabContainer, 
-	     ContentPane, ioQuery, Observable, CouchdbStore,
+	     ContentPane, Button, TextBox, NumberTextBox, domStyle,
+	     ioQuery, Observable, CouchdbStore,
 	     OnDemandList, put, request, domConstruct ){
       
       // grab all known clsuters into a store
@@ -114,7 +119,12 @@
       
       // for every known clsuter, create a new tab
       store.query({ startKey: {} }).forEach(function(row){
-	
+
+
+	// create a details panel with some widget in it
+	var detailPanel = new BorderContainer({
+	  region: "center"
+	  });
 	
 	// now, ask for the jobs for this cluster and list them out
 	var c = dojo.toJson( row ) + "<br><br>"
@@ -174,6 +184,52 @@
 	  splitter: true
 	});
 	job_list_pane.addChild( job_list );
+
+	// add the content pane (where the pretty json is )
+	// to the detail panel
+	detailPanel.addChild( contentPane );
+
+	// add a job submitter to the detail panel
+	var jobSubmitPanel = new ContentPane({
+	  region: "bottom"
+	});
+	var num_submits_box = new NumberTextBox({
+	  value: 1,
+	  required: true
+	});
+	domStyle.set( num_submits_box.domNode, "width", "4em" );
+	var script_box = new TextBox({
+	  placeholder: "path-to-script",
+	  label: "script:"
+	});
+	var x_label_box = new TextBox({
+	  value: "X"
+	});
+	domStyle.set( x_label_box.domNode, "width", "1em" );
+	jobSubmitPanel.addChild( new Button({
+	  label: "new job",
+	  onClick: function() {
+	    console.log( "request " + num_submits_box.value + " scripts of " + script_box.value + " on " + row.value.cluster.cluster_id );
+	    for( var i = 0; i < num_submits_box.value; ++i ) {
+	      request.post( "http://localhost:5984/jobs/",
+			    {
+			      data: dojo.toJson(
+				{ job:
+				  { status: "request:new",
+				    script: script_box.value,
+				    cluster_id: row.value.cluster.cluster_id }}),
+			      headers: { "Content-Type" : "application/json" },
+			      handleAs: "json"
+			    } ).then( function(response){
+			      contentPane.set( "content", dojo.toJson( response ) );
+			    });
+	    }
+	  }
+	}))
+	jobSubmitPanel.addChild( script_box );
+	jobSubmitPanel.addChild( x_label_box );
+	jobSubmitPanel.addChild( num_submits_box );
+	detailPanel.addChild( jobSubmitPanel );
 	
 	// add content pane and list to container 
 	container.addChild( new ContentPane({
@@ -182,7 +238,7 @@
 	  content: "Some Header"
 	}));
 	container.addChild( job_list_pane );
-	container.addChild( contentPane );
+	container.addChild( detailPanel );
 	
 	// add the container to tab
 	tabContainer.addChild( container );
