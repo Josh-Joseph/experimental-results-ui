@@ -15,6 +15,11 @@ html, body {
 .claro .demoLayout .edgePanel {
     background-color: #d0e9fc;
 }
+
+.claro .demoLayout .jobList {
+    background-color: #d0e9fc;
+    width: 14em;
+}
  
 #viewsChart {
     width: 550px;

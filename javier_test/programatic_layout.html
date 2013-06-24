@@ -93,6 +93,9 @@
 	     "dojo/store/Observable",
 	     "dojo/store/CouchdbStore",
 	     "dgrid/OnDemandList",
+	     "dgrid/Selection",
+	     "dgrid/extensions/DijitRegistry",
+	     "dojo/_base/declare",
 	     "put-selector/put",
 	     "dojo/request",
 	     "dojo/dom-construct",
@@ -100,7 +103,8 @@
     function(registry, BorderContainer, TabContainer, 
 	     ContentPane, Button, TextBox, NumberTextBox, domStyle,
 	     ioQuery, Observable, CouchdbStore,
-	     OnDemandList, put, request, domConstruct ){
+	     OnDemandList, DGridSelection, DGridDijitRegistry, declare, 
+	     put, request, domConstruct ){
       
       // grab all known clsuters into a store
       
@@ -150,14 +154,20 @@
 	});
 	
 	// create an OnDemanList for hte jobs
-	var job_list = new OnDemandList({
+	var CustomList = declare( [OnDemandList, DGridSelection, DGridDijitRegistry] );
+	var job_list = new CustomList({
 	  store: jobs_store_by_cluster,
 	  query: "?key=" + dojo.toJson(row.value.cluster.cluster_id),
 	  region: "left",
-	  "class": "edgePanel",
+	  "class": "jobList",
 	  splitter: true,
+	  selectionMode: "single",
 	  renderRow: function( object, options ) {
-	    return put( "div", object.value.job.status + " :: " + object.value.job.script );
+	    var script_name = object.value.job.script;
+	    if( script_name.lastIndexOf( "/" ) > 0 ) {
+	      script_name = script_name.substr( script_name.lastIndexOf( "/" ) + 1 );
+	    }
+	    return put( "div", object.value.job.status + " :: " + script_name );
 	  }
 	});
 
@@ -234,7 +244,7 @@
 	// add content pane and list to container 
 	container.addChild( new ContentPane({
 	  region: "top",
-	  "class": "edgePanel",
+	  "class": "jobList",
 	  content: "Some Header"
 	}));
 	container.addChild( job_list_pane );
@@ -243,9 +253,8 @@
 	// add the container to tab
 	tabContainer.addChild( container );
 	
-	// refrech th job list
-	//console.log( "job_list.query: " + dojo.toJson( job_list.query ) );
-	job_list.refresh();
+	// actively call resize to refresh after adding the DGrid
+	tabContainer.resize();
       });
       
     });
