@@ -73,6 +73,8 @@ Running Javier test UI:
         
         cp -r experimental-results-ui/javier_test/ jetty-distribution-*/webapps/NAME/
         
+        cp -r experimental-results-ui/pretty-json/ jetty-distribution-*/webapps/NAME/
+        
         git clone git@github.com:josh00/experimental-results-framework-couchdb.git
         
 Load the couchdb design documents
@@ -87,7 +89,7 @@ Get CPM and get the dgrib component into your webapps
         cd jetty-distribution-*/webapps/NAME/
         cpm install dgrid
         
-To view the results, open a browser and go to localhost:8080/NAME/javier_test/test.html
+To view the results, open a browser and go to localhost:8080/NAME/javier_test/programatic_layout.html
 
 
 License:
