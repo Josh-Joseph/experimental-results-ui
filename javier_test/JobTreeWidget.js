@@ -118,6 +118,51 @@ function(declare,
     // This is an actual view of the jobs databse 
     toplevel_view_store: undefined,
 
+
+    //
+    // This function will be called when a script node is clicked
+    onScriptClick: undefined,
+
+    //
+    // This function will be call when a cluster node is clicked
+    onClusterClick: undefined,
+    
+    //
+    // This function will be called when a job node is clicked
+    onJobClick:undefined,
+
+
+    //
+    // Internal onClick handler which propagets to onScriptClick,
+    // onClusterClick, or onJobClick depending on node
+    _handleOnClick: function(object) {
+      if( !object.key ) {
+	return;
+      }
+      
+      if( object.key.length == 1) {
+	if( this.onScriptClick ) {
+	  this.onScriptClick( object );
+	}
+	return;
+      }
+
+      if( object.key.length == 2 &&
+	  !object.value.job ) {
+	if( this.onClusterClick ) {
+	  this.onClusterClick( object );
+	}
+	return;
+      }
+      
+      if( object.value.job ) {
+	if( this.onJobClick ) {
+	  this.onJobClick( object );
+	}
+	return;
+      }
+      
+    },
     
     
     //
@@ -127,6 +172,9 @@ function(declare,
     postCreate: function() {
       
       this.inherited( arguments );
+
+      // setup the onClick handler
+      this.onClick = this._handleOnClick;
     }
 
   });
