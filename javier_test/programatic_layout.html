@@ -94,28 +94,36 @@
 	     "dojo/store/CouchdbStore",
 	     "dgrid/OnDemandList",
 	     "dgrid/Selection",
+	     "dgrid/Keyboard",
 	     "dgrid/extensions/DijitRegistry",
 	     "dojo/_base/declare",
 	     "put-selector/put",
 	     "dojo/request",
 	     "dojo/dom-construct",
+	     "javier_test/CouchdbListWidget",
+	     "javier_test/SubmitJobsWidget",
 	     "dojo/domReady!"],
     function(registry, BorderContainer, TabContainer, 
 	     ContentPane, Button, TextBox, NumberTextBox, domStyle,
 	     ioQuery, Observable, CouchdbStore,
-	     OnDemandList, DGridSelection, DGridDijitRegistry, declare, 
-	     put, request, domConstruct ){
+	     OnDemandList, DGridSelection, DGridKeyboard,
+	     DGridDijitRegistry, declare, 
+	     put, request, domConstruct, 
+	     CouchdbListWidget,
+	     SubmitJobsWidget ){
       
       // grab all known clsuters into a store
       
       // create a dataztore from the clusters couchdb database
       var store = new Observable( new CouchdbStore({
-	target: "http://localhost:5984/clusters/_design/ui/_view/all"
+	target: "http://localhost:5984/clusters/",
+	view: "_design/ui/_view/all"
       }));
       
       // create a datastore for hte jobs database view by clsuter id
       var jobs_store_by_cluster = new Observable( new CouchdbStore({
-	target: "http://localhost:5984/jobs/_design/ui/_view/by_cluster_id"
+	target: "http://localhost:5984/jobs/",
+	view: "_design/ui/_view/by_cluster_id"
       }));
       
       // get the tab container
@@ -137,31 +145,30 @@
 	  region: "center"
 	});
 	
-	// Note: this happen async, so it will really happen after the rest of 
-	//       this function finished (usually)
-	//jobs_store_by_cluster.query( { key: dojo.toJson(row.value.cluster.cluster_id) } ).forEach(function( job_row ) {
-	//  console.log( "Got job: " + dojo.toJson( job_row ) );
-	//  c += "<li><h3>" + job_row.value.job.status + "</h3>";
-	//  c += "<h4>" + job_row.value.job.script + "</h4>";
-	//  c += "\n";
-	//  contentPane.set( 'content', c );
-	//});
-	
 	// create a new border container
 	var container = new BorderContainer({
 	  design: "headline",
 	  title: "cluster: " + row.value.cluster.hostname
 	});
+
+	// debug to see what query returns
+	jobs_store_by_cluster.query( "?key=" + dojo.toJson(row.value.cluster.cluster_id) ).then( function( res ) {
+	  dojo.when( res.total, function( total ) {
+	    //console.log( "Jobs total: " + total );
+	  });
+	});
 	
-	// create an OnDemanList for hte jobs
-	var CustomList = declare( [OnDemandList, DGridSelection, DGridDijitRegistry] );
-	var job_list = new CustomList({
-	  store: jobs_store_by_cluster,
+
+	// Create a couchdb backed list
+	var job_list = new CouchdbListWidget({
+	  database_url: "http://localhost:5984/jobs/",
+	  view: "_design/ui/_view/by_cluster_id",
 	  query: "?key=" + dojo.toJson(row.value.cluster.cluster_id),
 	  region: "left",
 	  "class": "jobList",
 	  splitter: true,
 	  selectionMode: "single",
+	  loadingMessage: "---loading---",
 	  renderRow: function( object, options ) {
 	    var script_name = object.value.job.script;
 	    if( script_name.lastIndexOf( "/" ) > 0 ) {
@@ -200,45 +207,11 @@
 	detailPanel.addChild( contentPane );
 
 	// add a job submitter to the detail panel
-	var jobSubmitPanel = new ContentPane({
-	  region: "bottom"
+	var jobSubmitPanel = new SubmitJobsWidget({
+	  region: "bottom",
+	  jobs_database_url: "http://localhost:5984/jobs/",
+	  cluster_id: row.value.cluster.cluster_id
 	});
-	var num_submits_box = new NumberTextBox({
-	  value: 1,
-	  required: true
-	});
-	domStyle.set( num_submits_box.domNode, "width", "4em" );
-	var script_box = new TextBox({
-	  placeholder: "path-to-script",
-	  label: "script:"
-	});
-	var x_label_box = new TextBox({
-	  value: "X"
-	});
-	domStyle.set( x_label_box.domNode, "width", "1em" );
-	jobSubmitPanel.addChild( new Button({
-	  label: "new job",
-	  onClick: function() {
-	    console.log( "request " + num_submits_box.value + " scripts of " + script_box.value + " on " + row.value.cluster.cluster_id );
-	    for( var i = 0; i < num_submits_box.value; ++i ) {
-	      request.post( "http://localhost:5984/jobs/",
-			    {
-			      data: dojo.toJson(
-				{ job:
-				  { status: "request:new",
-				    script: script_box.value,
-				    cluster_id: row.value.cluster.cluster_id }}),
-			      headers: { "Content-Type" : "application/json" },
-			      handleAs: "json"
-			    } ).then( function(response){
-			      contentPane.set( "content", dojo.toJson( response ) );
-			    });
-	    }
-	  }
-	}))
-	jobSubmitPanel.addChild( script_box );
-	jobSubmitPanel.addChild( x_label_box );
-	jobSubmitPanel.addChild( num_submits_box );
 	detailPanel.addChild( jobSubmitPanel );
 	
 	// add content pane and list to container 
@@ -253,10 +226,10 @@
 	// add the container to tab
 	tabContainer.addChild( container );
 	
-	// actively call resize to refresh after adding the DGrid
-	tabContainer.resize();
+	
       });
       
     });
   </script>
+
 </body>
