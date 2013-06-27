@@ -20,9 +20,11 @@
 	     "dijit/layout/TabContainer", 
 	     "dijit/layout/ContentPane", 
 	     "dojo/io-query",
+	     "javier_test/JobTreeWidget",
 	     "dojo/domReady!"],
 	  
-    function(registry, BorderContainer, TabContainer, ContentPane, ioQuery){
+    function(registry, BorderContainer, TabContainer, ContentPane, ioQuery,
+	    JobTreeWidget){
 	  
       // create the main bordercontainer layout panel
       // attached to the appLayout DIV
@@ -56,7 +58,9 @@
 	  id: "leftCol",
 	  "class": "edgePanel",
 	  splitter: true,
-	  content: "Sidebar content (left)"
+	  content: new JobTreeWidget({
+	    jobs_database_url: "http://localhost:5984/jobs/"
+	  })
 	}));
       
       // add initial tab
@@ -100,8 +104,8 @@
 	     "put-selector/put",
 	     "dojo/request",
 	     "dojo/dom-construct",
-	     "javier_test/CouchdbListWidget",
-	     "javier_test/SubmitJobsWidget",
+	     "test/CouchdbListWidget",
+	     "test/SubmitJobsWidget",
 	     "dojo/domReady!"],
     function(registry, BorderContainer, TabContainer, 
 	     ContentPane, Button, TextBox, NumberTextBox, domStyle,
@@ -110,7 +114,7 @@
 	     DGridDijitRegistry, declare, 
 	     put, request, domConstruct, 
 	     CouchdbListWidget,
-	     SubmitJobsWidget ){
+	     SubmitJobsWidget){
       
       // grab all known clsuters into a store
       
