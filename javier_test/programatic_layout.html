@@ -21,10 +21,12 @@
 	     "dijit/layout/ContentPane", 
 	     "dojo/io-query",
 	     "javier_test/JobTreeWidget",
+	     "javier_test/CouchdbBackedContentPane",
+	     "dojo/store/CouchdbStore",
 	     "dojo/domReady!"],
 	  
     function(registry, BorderContainer, TabContainer, ContentPane, ioQuery,
-	    JobTreeWidget){
+	    JobTreeWidget, CouchdbBackedContentPane, CouchdbStore ){
 	  
       // create the main bordercontainer layout panel
       // attached to the appLayout DIV
@@ -46,10 +48,20 @@
       
       // add the header top and edge panels
       appLayout.addChild( 
-	new ContentPane({
+	new CouchdbBackedContentPane({
 	  region: "top",
 	  "class": "edgePanel",
-	  content: "Header Content (top)"
+	  content: "Header Content (top)",
+	  store: new CouchdbStore({
+	    target: "http://localhost:5984/jobs/",
+	    view: "_design/ui/_view/status_count_by_script",
+	  }),
+	  query: { reduce: true,
+		   group: true,
+		   group_level: 0 },
+	  getContent: function(res) {
+	    return "Jobs Status: " + dojo.toJson( res[0].value );
+	  }
 	}));
       
       appLayout.addChild(
@@ -59,7 +71,17 @@
 	  "class": "edgePanel",
 	  splitter: true,
 	  content: new JobTreeWidget({
-	    jobs_database_url: "http://localhost:5984/jobs/"
+	    jobs_database_url: "http://localhost:5984/jobs/",
+	    showRoot: false,
+	    onJobClick: function( job ) {
+	      console.log( "Job: " + dojo.toJson( job ) );
+	    },
+	    onScriptClick: function( script ) {
+	      console.log( "Script: " + dojo.toJson( script ) );
+	    },
+	    onClusterClick: function( cluster ) {
+	      console.log( "Cluster: " + dojo.toJson( cluster ) );
+	    }
 	  })
 	}));
       
@@ -104,8 +126,8 @@
 	     "put-selector/put",
 	     "dojo/request",
 	     "dojo/dom-construct",
-	     "test/CouchdbListWidget",
-	     "test/SubmitJobsWidget",
+	     "javier_test/CouchdbListWidget",
+	     "javier_test/SubmitJobsWidget",
 	     "dojo/domReady!"],
     function(registry, BorderContainer, TabContainer, 
 	     ContentPane, Button, TextBox, NumberTextBox, domStyle,
@@ -182,6 +204,12 @@
 	  }
 	});
 
+	// create a new prettyjson node on hte content pane
+	var pretty_json_node = new PrettyJSON.view.Node({
+	  el: contentPane.domNode,
+	  data: null
+	});
+
 	// Ok, we want to hook up an event listener to this new list
 	// which handles clicking on a row to log the 
 	// json object clicked on (the job)
@@ -193,7 +221,9 @@
 	  // row.data contains the actual couchdb job document from hte store!
 	  
 	  // set the centeral pane content to the job document clicked on
-	  var pretty_json_node = new PrettyJSON.view.Node({
+	  contentPane.set( "content", null );
+	  delete pretty_json_node;
+	  pretty_json_node = new PrettyJSON.view.Node({
 	    el: contentPane.domNode,
 	    data: row.data.value
 	  });

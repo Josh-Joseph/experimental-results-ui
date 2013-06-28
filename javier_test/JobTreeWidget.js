@@ -69,12 +69,14 @@ function(declare,
 	    startkey: dojo.toJson( [ object.key[0] ] ),
 	    endkey: dojo.toJson( [ object.key[0], {} ] )
 	  });
-	} else if( object.key.length == 2 ) {
+	} else if( object.key.length == 2 && !object.value.job ) {
 	  //console.log( "running level 3" );
 	  return self.toplevel_view_store.query({ 
 	    group: false, 
 	    reduce: false, 
 	    key: dojo.toJson( object.key ) });
+	} else if( object.key.length == 2 && object.value.job ) {
+	  return [];
 	}
 	
 	console.log( "fell thoirugh!" );
@@ -85,22 +87,13 @@ function(declare,
       this.model = new ObjectStoreModel({
 	store: self.toplevel_view_store,
 	query: { group: false, reduce: true },
-	getLabel : function( object ) {
-	  if( !object.key ) {
-	    return "JOBS";
+	getLabel : self._getLabel,
+	mayHaveChildren: function(object) {
+	  if( object.key && object.key.length == 2 && object.value.job ) {
+	    return false;
 	  }
-	  if( object.key.length == 1 ) {
-	    return object.key;
-	  }
-	  if( object.key.length == 2 &&
-	      !object.value.job ) {
-	    return "cluster: " + object.key[1];
-	  }
-	  if( object.value.job ) {
-	    return object.value.job.job_id;
-	  }
-	  return "<<undef>>";
-	}
+	  return true;
+	},
       });
       
     },
@@ -164,6 +157,27 @@ function(declare,
       
     },
     
+
+    //
+    // Internal function that returns the label for a node in the tree
+    // THis is where the logic goes that changes from query results to
+    // labels in the tree widget
+    _getLabel:function( object ) {
+      if( !object.key ) {
+	return "JOBS";
+      }
+      if( object.key.length == 1 ) {
+	return object.key;
+      }
+      if( object.key.length == 2 &&
+	  !object.value.job ) {
+	return "cluster: " + object.key[1];
+      }
+      if( object.value.job ) {
+	return object.value.job.job_id;
+      }
+      return "<<undef>>";
+    },
     
     //
     // This is where we create the widget child elements and customize
