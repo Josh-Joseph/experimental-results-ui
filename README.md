@@ -81,7 +81,7 @@ Load the couchdb design documents
         
         python experimental-results-framework-couchdb/load-design-document.py --recursive --autodetect-database-from-directory-structure couchdb-design-documents/
         
-Get CPM and get the dgrib component into your webapps
+Get CPM and get the dgrib component into your webapps (you may need to "sudo su" to install cpm)
 
         git clone https://github.com/kriszyp/cpm.git
         cd cpm
