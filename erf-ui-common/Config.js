@@ -13,6 +13,7 @@ function( exports, require, module ) {
 
   return {
     computation_database_url: DATABASE_URL + "computations/",
+    job_database_url: DATABASE_URL + "jobs/",
     clusters_database_url: DATABASE_URL + "clusters/",
   };
 });

@@ -2,8 +2,8 @@
 // 
 // This module reresents a widget to submit comoputations to a particular 
 // cluster.
-// The widget simply requires teh cluster id and the couchdb computation databse
-// to submit computations to.
+// The widget simply requires teh cluster id and the couchdb job databse
+// to submit jobs to.
 
 define([
   "dojo/_base/declare",
@@ -24,13 +24,13 @@ function(declare,
     
     
     //
-    // Create a new submit computations woidget.
+    // Create a new submit jobs woidget.
     // This is internally a content pane (so a dijit widget)
-    // with tied couchdb computations database url
+    // with tied couchdb jobs database url
     //
     // The options given will be mixed in with this object.
     // You must provide at least the following:
-    //    computation_database_url : String
+    //    job_database_url : String
     //    cluster_id : String
     constructor: function(options) {
 
@@ -41,28 +41,28 @@ function(declare,
 
 
     //
-    // The url for hte computations databse to submit computations to
+    // The url for hte jobs databse to submit jobs to
     // This should be the base databse url (not a view)
     // and should end with a /
-    computation_database_url : undefined,
+    job_database_url : undefined,
     
     //
-    // The id for the cluster to submit computations to.
+    // The id for the cluster to submit jobs to.
     // This should be the uniqu string id
     cluster_id : undefined,
 
 
     //
     // A callback function to be called whenever we submit a 
-    // computation.
+    // job.
     // This is here to allow for the user to add their own callback whenever
-    // a computation is called.
+    // a job is called.
     //
     // The callback is given the response from couchdb when trying to
-    // submit a new document to the computation databse.
+    // submit a new document to the job databse.
     //
     // callback type: xhr.response -> void
-    on_submit_computation_request_response: undefined,
+    on_submit_job_request_response: undefined,
     
     //
     // Creates the widget childern and add them to this content pane.
@@ -74,7 +74,7 @@ function(declare,
       // call inherited postCreate
       this.inherited(arguments);
       
-      // create two text boxes for script path and number of computations to submit
+      // create two text boxes for script path and number of jobs to submit
       var num_submits_box = new NumberTextBox({
 	value: 1,
 	required: true
@@ -88,14 +88,14 @@ function(declare,
       // create and add a submit button
       var self = this;
       this.addChild( new Button({
-	label: "new computation",
+	label: "new job",
 	onClick: function() {
 	  console.log( "request " + num_submits_box.value + " scripts of " + script_box.value + " on " + self.cluster_id );
 	  for( var i = 0; i < num_submits_box.value; ++i ) {
 	    var req = 
-	      request.post( self.computation_database_url,{
+	      request.post( self.job_database_url,{
 		data: dojo.toJson(
-		  { computation:
+		  { job:
 		    { status: "request:new",
 		      script: script_box.value,
 		      cluster_id: self.cluster_id }}),
@@ -105,8 +105,8 @@ function(declare,
 	    
 	    // If the user has wanted to rrun a callback on the request
 	    // response. attached it to the deffered
-	    if( self.on_submit_computation_request_response ) {
-	      req.then( self.on_submit_computation_request_response );
+	    if( self.on_submit_job_request_response ) {
+	      req.then( self.on_submit_job_request_response );
 	    }
 	  }
 	}

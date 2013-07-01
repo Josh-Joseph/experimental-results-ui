@@ -22,14 +22,14 @@
 	     "dijit/layout/ContentPane", 
 	     "dojo/io-query",
 	     "erf-ui-common/Config",
-	     "erf-ui-common/ComputationTreeWidget",
+	     "erf-ui-common/JobTreeWidget",
 	     "erf-ui-common/CouchdbBackedContentPane",
 	     "erf-ui-common/CouchdbStore",
 	     "dojo/domReady!"],
 	  
     function(registry, BorderContainer, TabContainer, ContentPane, ioQuery,
 	     erfConfig,
-	     ComputationTreeWidget, CouchdbBackedContentPane, CouchdbStore ){
+	     JobTreeWidget, CouchdbBackedContentPane, CouchdbStore ){
 
       console.log( "erfConfig: " + dojo.toJson( erfConfig ) );
 	  
@@ -58,14 +58,14 @@
 	  "class": "edgePanel",
 	  content: "Header Content (top)",
 	  store: new CouchdbStore({
-	    target: erfConfig.computation_database_url,
+	    target: erfConfig.job_database_url,
 	    view: "_design/ui/_view/status_count_by_script",
 	  }),
 	  query: { reduce: true,
 		   group: true,
 		   group_level: 0 },
 	  getContent: function(res) {
-	    return "Computation Status: " + dojo.toJson( res[0].value );
+	    return "Job Status: " + dojo.toJson( res[0].value );
 	  }
 	}));
       
@@ -75,11 +75,11 @@
 	  id: "leftCol",
 	  "class": "edgePanel",
 	  splitter: true,
-	  content: new ComputationTreeWidget({
-	    computation_database_url: erfConfig.computation_database_url,
+	  content: new JobTreeWidget({
+	    job_database_url: erfConfig.job_database_url,
 	    showRoot: false,
-	    onComputationClick: function( comp ) {
-	      console.log( "Computation: " + dojo.toJson( comp ) );
+	    onJobClick: function( comp ) {
+	      console.log( "Job: " + dojo.toJson( comp ) );
 	    },
 	    onScriptClick: function( script ) {
 	      console.log( "Script: " + dojo.toJson( script ) );
@@ -134,7 +134,7 @@
 	     "dojo/dom-construct",
 	     "erf-ui-common/Config",
 	     "erf-ui-common/CouchdbListWidget",
-	     "erf-ui-common/SubmitComputationWidget",
+	     "erf-ui-common/SubmitJobWidget",
 	     "dojo/domReady!"],
     function(registry, BorderContainer, TabContainer, 
 	     ContentPane, Button, TextBox, NumberTextBox, domStyle,
@@ -144,7 +144,7 @@
 	     put, request, domConstruct,
 	     erfConfig,
 	     CouchdbListWidget,
-	     SubmitComputationWidget){
+	     SubmitJobWidget){
       
       // grab all known clsuters into a store
       
@@ -154,9 +154,9 @@
 	view: "_design/ui/_view/all"
       }));
       
-      // create a datastore for hte computations database view by clsuter id
-      var computation_store_by_cluster = new Observable( new CouchdbStore({
-	target: erfConfig.computation_database_url,
+      // create a datastore for hte jobs database view by clsuter id
+      var job_store_by_cluster = new Observable( new CouchdbStore({
+	target: erfConfig.job_database_url,
 	view: "_design/ui/_view/by_cluster_id"
       }));
       
@@ -187,8 +187,8 @@
 	
 
 	// Create a couchdb backed list
-	var computation_list = new CouchdbListWidget({
-	  database_url: erfConfig.computation_database_url,
+	var job_list = new CouchdbListWidget({
+	  database_url: erfConfig.job_database_url,
 	  view: "_design/ui/_view/by_cluster_id",
 	  query: "?key=" + dojo.toJson(row.value.cluster.cluster_id),
 	  region: "left",
@@ -197,11 +197,11 @@
 	  selectionMode: "single",
 	  loadingMessage: "---loading---",
 	  renderRow: function( object, options ) {
-	    var script_name = object.value.computation.script;
+	    var script_name = object.value.job.script;
 	    if( script_name.lastIndexOf( "/" ) > 0 ) {
 	      script_name = script_name.substr( script_name.lastIndexOf( "/" ) + 1 );
 	    }
-	    return put( "div", object.value.computation.status + " :: " + script_name );
+	    return put( "div", object.value.job.status + " :: " + script_name );
 	  }
 	});
 
@@ -213,9 +213,9 @@
 
 	// Ok, we want to hook up an event listener to this new list
 	// which handles clicking on a row to log the 
-	// json object clicked on (the computation)
-	computation_list.on( ".dgrid-row:click", function(evt) {
-	  var row = computation_list.row( evt );
+	// json object clicked on (the job)
+	job_list.on( ".dgrid-row:click", function(evt) {
+	  var row = job_list.row( evt );
 
 	  // row.data contains the actual couchdb job document from hte store!
 	  // set the centeral pane content to the job document clicked on
@@ -227,32 +227,32 @@
 	  });
 	});
 	
-	var computation_list_pane = new ContentPane({
+	var job_list_pane = new ContentPane({
 	  region: "left",
 	  "class": "edgePanel",
 	  splitter: true
 	});
-	computation_list_pane.addChild( computation_list );
+	job_list_pane.addChild( job_list );
 
 	// add the content pane (where the pretty json is )
 	// to the detail panel
 	detailPanel.addChild( contentPane );
 
-	// add a computation submitter to the detail panel
-	var computationSubmitPanel = new SubmitComputationWidget({
+	// add a job submitter to the detail panel
+	var jobSubmitPanel = new SubmitJobWidget({
 	  region: "bottom",
-	  computation_database_url: erfConfig.computation_database_url,
+	  job_database_url: erfConfig.job_database_url,
 	  cluster_id: row.value.cluster.cluster_id
 	});
-	detailPanel.addChild( computationSubmitPanel );
+	detailPanel.addChild( jobSubmitPanel );
 	
 	// add content pane and list to container 
 	container.addChild( new ContentPane({
 	  region: "top",
-	  "class": "computationList",
+	  "class": "jobList",
 	  content: "Some Header"
 	}));
-	container.addChild( computation_list_pane );
+	container.addChild( job_list_pane );
 	container.addChild( detailPanel );
 	
 	// add the container to tab
