@@ -92,6 +92,38 @@ Get CPM and get the dgrib component into your webapps (you may need to "sudo su"
 To view the results, open a browser and go to localhost:8080/NAME/javier_test/programatic_layout.html
 
 
+Running ERF Dashboartd UI:
+-----------------------
+
+        git clone git@github.com:josh00/experimental-results-ui.git
+        
+        mkdir jetty-distribution-*/webapps/NAME_2/
+        
+        ln -s experimental-results-ui/erf-ui-common jetty-distribution-*/webapps/NAME_2/erf-ui-common
+        
+        ln -s experimental-results-ui/erf-ui jetty-distribution-*/webapps/NAME_2/erf-ui
+        
+        ln -s experimental-results-ui/styles jetty-distribution-*/webapps/NAME_2/styles
+        
+        ln -s experimental-results-ui/pretty-json jetty-distribution-*/webapps/NAME_2/pretty-json
+        
+        git clone git@github.com:josh00/experimental-results-framework-couchdb.git
+        
+Load the couchdb design documents
+        
+        python experimental-results-framework-couchdb/load-design-document.py --recursive --autodetect-database-from-directory-structure couchdb-design-documents/
+        
+Get CPM and get the dgrib component into your webapps (you may need to "sudo su" to install cpm)
+
+        git clone https://github.com/kriszyp/cpm.git
+        cd cpm
+        sh install
+        cd jetty-distribution-*/webapps/NAME_2/
+        cpm install dgrid
+        
+To view the results, open a browser and go to localhost:8080/NAME_2/erf-ui/dashboard.html
+
+
 License:
 -------
 This module is distrubted under the MIT license.
