@@ -109,9 +109,9 @@ Running ERF Dashboartd UI:
         
         git clone git@github.com:josh00/experimental-results-framework-couchdb.git
         
-Load the couchdb design documents
+Load the couchdb design documents (this wil OVERWRITE any previous design docs since it uses --force !)
         
-        python experimental-results-framework-couchdb/load-design-document.py --recursive --autodetect-database-from-directory-structure couchdb-design-documents/
+        python experimental-results-framework-couchdb/load-design-document.py --force --recursive --autodetect-database-from-directory-structure couchdb-design-documents/
         
 Get CPM and get the dgrib component into your webapps (you may need to "sudo su" to install cpm)
 
