@@ -14,11 +14,13 @@ define([
   "dgrid/Selection",
   "dgrid/Keyboard",
   "dgrid/extensions/DijitRegistry",
+  "dgrid/util/misc",
   "dojo/_base/declare"],
        
 function( Observable, CouchdbStore, 
 	  OnDemandList, DGridSelection, DGridKeyboard,
 	  DGridDijitRegistry,
+	  DGridUtil,
 	  declare) {
   
   
@@ -49,10 +51,10 @@ function( Observable, CouchdbStore,
       
       // setup the refresh on a new bit of data
       var self = this;
-      this.database_event_source.addEventListener( "message", function(evt) {
+      this.database_event_source.addEventListener( "message", DGridUtil.debounce( function(evt) {
 	self.refresh();
-      });
-    },
+      }, this, 2000 ));
+    }, 
 		     
     
     //
