@@ -25,11 +25,13 @@
 	     "erf-ui-common/JobTreeWidget",
 	     "erf-ui-common/CouchdbBackedContentPane",
 	     "erf-ui-common/CouchdbStore",
+	     "erf-ui-common/Histogram",
 	     "dojo/domReady!"],
 	  
     function(registry, BorderContainer, TabContainer, ContentPane, ioQuery,
 	     erfConfig,
-	     JobTreeWidget, CouchdbBackedContentPane, CouchdbStore ){
+	     JobTreeWidget, CouchdbBackedContentPane, CouchdbStore,
+	     Histogram ){
 
       console.log( "erfConfig: " + dojo.toJson( erfConfig ) );
 	  
@@ -89,6 +91,20 @@
 	    }
 	  })
 	}));
+
+      // add a histogram as the right child
+      appLayout.addChild(
+	new Histogram({
+	  region: "right",
+	  min: 40,
+	  max: 60,
+	  database: "http://localhost:5984/local_results/",
+	  view: "_design/sandbox/_view/rereduce_count",
+	  query: { reduce: false,
+		   group: false },
+	  series_title: "Testing"
+	}));
+		   
       
       // add initial tab
       var query_string = ""
