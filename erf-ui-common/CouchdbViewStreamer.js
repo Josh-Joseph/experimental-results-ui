@@ -7,10 +7,12 @@
 
 define([
   "dojo/store/CouchdbStore",
-  "dojo/_base/declare"],
+  "dojo/_base/declare",
+  "dojo/Deferred"],
        
 function( CouchdbStore, 
-	  declare) {
+	  declare,
+	  Deferred) {
   
 
   return declare( null, {
@@ -47,9 +49,13 @@ function( CouchdbStore,
     // Iterate over all the elements from the view/query and call
     // given function iwth them in order.
     // This takes care of batching the couchdb requests under the hood
-    forEach: function( fn, offset ) {
+    forEach: function( fn, offset, all_done_def ) {
       
       offset = offset || 0;
+
+      // create a deffered for when all batches have been fetched and 
+      // mapped
+      all_done_def = all_done_def || new Deferred();
       
       // fetch the next batch from view
       var q = this.query;
@@ -57,13 +63,20 @@ function( CouchdbStore,
       q.skip = offset;
       batch = this.store.query( q );
       var self = this;
-      return batch.then( function( result ) {
+      batch.then( function( result ) {
 	if( result.length > 0 && offset < result.total ) {
+	  console.log( "view batch: offset: " + offset + " r.l: " + result.length );
 	  batch.forEach( fn );
-	  self.forEach( fn, offset + result.length );
+	  self.forEach( fn, offset + result.length, all_done_def );
+	} else {
+	  // we are done with all batched, resolve the deffered
+	  // console.log( "view-streamer: RESOLVED" );
+	  all_done_def.resolve( "" );
 	}
       });
       
+      // return the promise
+      return all_done_def.promise;
     },
     
   });

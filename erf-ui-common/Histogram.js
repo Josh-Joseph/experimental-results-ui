@@ -104,6 +104,7 @@ function( declare,
 	}
       }).then( function( res ) {
 	
+	//console.log( "RES: " + dojo.toJson(res) );
 	//console.log( "BINS: " + dojo.toJson( bins ) );
 	
 	// convert form bins to histogram data (x,y)

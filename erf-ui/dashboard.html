@@ -96,8 +96,10 @@
       appLayout.addChild(
 	new Histogram({
 	  region: "right",
+	  splitter: true,
 	  min: 40,
 	  max: 60,
+	  batch_size: 500,
 	  database: "http://localhost:5984/local_results/",
 	  view: "_design/sandbox/_view/rereduce_count",
 	  query: { reduce: false,
