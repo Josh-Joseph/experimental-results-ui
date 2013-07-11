@@ -59,13 +59,16 @@
       
       // add the tab container to the appLayout
       appLayout.addChild( contentTabs );
-      
-      // add the header top and edge panels
-      appLayout.addChild( 
+
+      // create the header with the jobs status and the local resutls status
+      var header_panel = new ContentPane({
+	region: "top",
+	"class": "headerPanel"
+      });
+
+      header_panel.addChild( 
 	new CouchdbBackedContentPane({
-	  region: "top",
-	  "class": "edgePanel",
-	  content: "Header Content (top)",
+	  content: "Header Content (Jobs)",
 	  store: new CouchdbStore({
 	    target: erfConfig.job_database_url,
 	    view: "_design/ui/_view/status_count_by_script",
@@ -82,6 +85,37 @@
 	    }
 	  }
 	}));
+
+      header_panel.addChild( 
+	new CouchdbBackedContentPane({
+	  content: "Header Content (Results)",
+	  store: new CouchdbStore({
+	    target: erfConfig.local_results_database_url,
+	    view: "_design/ui/_view/count_by_version",
+	    enable_event_source: true
+	  }),
+	  query: { reduce: true,
+		   group: true,
+		   group_level: 1 },
+	  getContent: function(res) {
+	    if( res && Array.isArray(res) && res.length > 0 ) {
+	      var mesg = "Computations: ";
+	      var total = 0;
+	      for( var i = 0; i < res.length; ++i ) {
+		mesg += res[i].value + " | ";
+		total += res[i].value;
+	      }
+	      mesg += "Total = " + total;
+	      return mesg;
+	    } else {
+	      return "No Computations";
+	    }
+	  }
+	}));
+      
+      
+      // add the header top and edge panels
+      appLayout.addChild( header_panel );
       
       appLayout.addChild(
       	new ContentPane({

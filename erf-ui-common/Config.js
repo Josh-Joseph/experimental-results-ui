@@ -15,6 +15,7 @@ function( exports, require, module ) {
     computation_database_url: DATABASE_URL + "computations/",
     job_database_url: DATABASE_URL + "jobs/",
     clusters_database_url: DATABASE_URL + "clusters/",
+    local_results_database_url: DATABASE_URL + "local_results/",
   };
 });
 

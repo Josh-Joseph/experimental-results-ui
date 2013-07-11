@@ -16,6 +16,16 @@ html, body {
     background-color: #d0e9fc;
 }
 
+.claro .demoLayout .headerPanel {
+    background-color: #d0e9fc;
+}
+
+.claro .demoLayout .headerPanel * {
+    background-color: #d0e9fc;
+    display: inline;
+}
+
+
 .claro .demoLayout .computationList {
     background-color: #d0e9fc;
     width: 14em;
