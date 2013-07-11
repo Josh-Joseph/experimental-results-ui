@@ -69,6 +69,7 @@
 	  store: new CouchdbStore({
 	    target: erfConfig.job_database_url,
 	    view: "_design/ui/_view/status_count_by_script",
+	    enable_event_source: true
 	  }),
 	  query: { reduce: true,
 		   group: true,
