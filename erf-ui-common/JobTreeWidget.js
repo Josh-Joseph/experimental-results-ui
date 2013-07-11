@@ -10,12 +10,11 @@
 define([
   "dojo/_base/declare",
   "erf-ui-common/CouchdbStore",
-  "dojo/store/Observable",
   "dijit/Tree",
   "dijit/tree/ObjectStoreModel" ],
        
 function(declare,
-	 CouchdbStore, Observable,
+	 CouchdbStore,
 	 Tree, ObjectStoreModel,
 	 request ) {
   
@@ -36,11 +35,11 @@ function(declare,
       var self = this;
 
       // create the store for the toplevel view
-      this.toplevel_view_store = new Observable( new CouchdbStore({
+      this.toplevel_view_store = new CouchdbStore({
 	target: self.job_database_url,
 	view: "_design/ui/_view/status_count_by_script",
 	idProperty: "key"
-      }));
+      });
 
       // augment the store to have a getChildren method
       // THIS IS PARTICULAR TO THE JOB VIEW WE ARE USING!

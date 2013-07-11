@@ -34,6 +34,13 @@
 	     Histogram ){
 
       console.log( "erfConfig: " + dojo.toJson( erfConfig ) );
+
+      // create a store for javire-test databse jsut to see if changes work
+      var test_store = new CouchdbStore({
+	target: "http://localhost:5984/javier-test/",
+	view: "_design/test/_view/all_tests" 
+      });
+	
 	  
       // create the main bordercontainer layout panel
       // attached to the appLayout DIV
@@ -67,46 +74,49 @@
 		   group: true,
 		   group_level: 0 },
 	  getContent: function(res) {
-	    return "Job Status: " + dojo.toJson( res[0].value );
+	    if( res && Array.isArray(res) && res.length > 0 && res[0].value) {
+	      return "Job Status: " + dojo.toJson( res[0].value );
+	    } else {
+	      return "No Jobs";
+	    }
 	  }
 	}));
       
       appLayout.addChild(
-	new ContentPane({
-	  region: "left",
-	  id: "leftCol",
-	  "class": "edgePanel",
-	  splitter: true,
-	  content: new JobTreeWidget({
-	    job_database_url: erfConfig.job_database_url,
-	    showRoot: false,
-	    onJobClick: function( comp ) {
-	      console.log( "Job: " + dojo.toJson( comp ) );
-	    },
-	    onScriptClick: function( script ) {
-	      console.log( "Script: " + dojo.toJson( script ) );
-	    },
-	    onClusterClick: function( cluster ) {
-	      console.log( "Cluster: " + dojo.toJson( cluster ) );
-	    }
-	  })
-	}));
+      	new ContentPane({
+      	  region: "left",
+      	  id: "leftCol",
+      	  "class": "edgePanel",
+      	  splitter: true,
+      	  content: new JobTreeWidget({
+      	    job_database_url: erfConfig.job_database_url,
+      	    showRoot: false,
+      	    onJobClick: function( comp ) {
+      	      console.log( "Job: " + dojo.toJson( comp ) );
+      	    },
+      	    onScriptClick: function( script ) {
+      	      console.log( "Script: " + dojo.toJson( script ) );
+      	    },
+      	    onClusterClick: function( cluster ) {
+      	      console.log( "Cluster: " + dojo.toJson( cluster ) );
+      	    }
+      	  })
+      	}));
 
       // add a histogram as the right child
       appLayout.addChild(
 	new Histogram({
 	  region: "right",
 	  splitter: true,
-	  min: 40,
-	  max: 60,
-	  batch_size: 500,
-	  database: "http://localhost:5984/local_results/",
-	  view: "_design/sandbox/_view/rereduce_count",
-	  query: { reduce: false,
-		   group: false },
-	  series_title: "Testing"
-	}));
-		   
+      	  min: 40,
+      	  max: 60,
+      	  //batch_size: 500,
+      	  database: "http://localhost:5984/local_results/",
+      	  view: "_design/sandbox/_view/rereduce_count",
+      	  query: { reduce: false,
+      		   group: false },
+      	  series_title: "Testing"
+      	}));
       
       // add initial tab
       var query_string = ""

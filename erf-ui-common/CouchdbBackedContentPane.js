@@ -38,12 +38,14 @@ function(declare,
       
       declare.safeMixin( this, options );
       
-      // create the event source
-      this.change_event_source = new EventSource( this.store.target + this.event_feed_query );
       var self = this;
-      this.change_event_source.addEventListener( "message", function( evt ) {
-	self._handle_change_from_event_source(evt);
-      });
+      if( this.store.event_source ) {
+	this.store.event_source.addEventListener( "message", function( evt ) {
+	  self._handle_change_from_event_source(evt);
+	});
+      } else {
+	console.warn( "Store Backed Content Pane given store without event source!" );
+      }
     },
 
     
@@ -55,11 +57,6 @@ function(declare,
     // The query to run to get the result from the couchdb store
     // in order to build up the contents of this widget
     query: { startkey: null },
-
-    //
-    // The string to append to get an event feed from the
-    // couchdb databse specified as store.target
-    event_feed_query: "_changes?since=now&feed=eventsource",
     
     //
     // Function which returns the content for this content pane given the

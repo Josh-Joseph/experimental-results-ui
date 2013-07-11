@@ -49,6 +49,8 @@ function( declare,
 	query: this.query,
 	batch_size: this.batch_size
       });
+
+      console.log( "histogram: created streamer" );
     },
 
     min: undefined,
@@ -64,6 +66,8 @@ function( declare,
     postCreate: function() {
       this.inherited( arguments );
       
+      console.log( "histogram: postCreate");
+      
       // create the bar chart widget
       this.chart = new Chart( this.domNode );
       this.chart.setTheme( theme );
@@ -77,7 +81,6 @@ function( declare,
 
       // create the zoom and pan
       new MouseZoomAndPan( this.chart, "default", { axis: "x" } );
-
       
       // compute bins from the view and add them as a serier to chart
       var hist_data = [];
@@ -89,11 +92,17 @@ function( declare,
 		     max: i + step,
 		     count: 0} );
       }
+      console.log( "Histogram: finished creating bins..." );
       
       // bin the data from the view
       var self = this;
+      var count = 0;
       this.view_streamer.forEach( function( row ) {
 	var item = row.value;
+	count = count + 1;
+	if( count % 100 == 0 ) {
+	  console.log( "histogram: binned " + count + " items" );
+	}
 	//console.log( "  stream item: " + dojo.toJson( item ) );
 	for( var i = 0; i < bins.length; ++i ) {
 	  var bin = bins[i];
@@ -107,6 +116,8 @@ function( declare,
 	//console.log( "RES: " + dojo.toJson(res) );
 	//console.log( "BINS: " + dojo.toJson( bins ) );
 	
+	console.log( "Histogram: binned data" );
+	
 	// convert form bins to histogram data (x,y)
 	for( var i = 0; i < bins.length; ++i ) {
 	  hist_data.push( { x: self.min + i * step,
@@ -117,9 +128,11 @@ function( declare,
 	
 	// add teh data
 	self.chart.addSeries( self.series_title, hist_data );
+	console.log( "histogram: added series" );
 	
 	// render hte chart
 	self.chart.render();
+	console.log( "Histogram: calling render()" );
       });
     },
 

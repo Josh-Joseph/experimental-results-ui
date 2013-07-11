@@ -8,8 +8,7 @@
 // will load on demand ratehr than all at once.
 
 define([
-  "dojo/store/Observable",
-  "dojo/store/CouchdbStore",
+  "erf-ui-common/CouchdbStore",
   "dgrid/OnDemandList",
   "dgrid/Selection",
   "dgrid/Keyboard",
@@ -17,7 +16,7 @@ define([
   "dgrid/util/misc",
   "dojo/_base/declare"],
        
-function( Observable, CouchdbStore, 
+function( CouchdbStore, 
 	  OnDemandList, DGridSelection, DGridKeyboard,
 	  DGridDijitRegistry,
 	  DGridUtil,

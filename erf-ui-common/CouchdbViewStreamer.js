@@ -33,6 +33,7 @@ function( CouchdbStore,
 	view: this.view 
       });
      
+      console.log( "viewstreamer: created store" );
     },
 
     
@@ -56,6 +57,8 @@ function( CouchdbStore,
       // create a deffered for when all batches have been fetched and 
       // mapped
       all_done_def = all_done_def || new Deferred();
+
+      console.log( "viewstreamer: foreach started, offset: " + offset );
       
       // fetch the next batch from view
       var q = this.query;
@@ -67,14 +70,23 @@ function( CouchdbStore,
 	if( result.length > 0 && offset < result.total ) {
 	  console.log( "view batch: offset: " + offset + " r.l: " + result.length );
 	  batch.forEach( fn );
-	  self.forEach( fn, offset + result.length, all_done_def );
+	  
+	  if( offset + result.length < result.total ) {
+	    self.forEach( fn, offset + result.length, all_done_def );
+	  } else {
+	    // we are done with all batched, resolve the deffered
+	    console.log( "view-streamer: RESOLVED-2" );
+	    all_done_def.resolve( "" );
+	  }
 	} else {
 	  // we are done with all batched, resolve the deffered
-	  // console.log( "view-streamer: RESOLVED" );
+	  console.log( "view-streamer: RESOLVED" );
 	  all_done_def.resolve( "" );
 	}
       });
       
+      console.log( "viewstreamer: retuining promise" );
+
       // return the promise
       return all_done_def.promise;
     },
