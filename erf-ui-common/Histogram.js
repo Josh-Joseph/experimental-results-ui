@@ -50,7 +50,7 @@ function( declare,
 	batch_size: this.batch_size
       });
 
-      console.log( "histogram: created streamer" );
+      //console.log( "histogram: created streamer" );
     },
 
     min: undefined,
@@ -66,7 +66,7 @@ function( declare,
     postCreate: function() {
       this.inherited( arguments );
       
-      console.log( "histogram: postCreate");
+      //console.log( "histogram: postCreate");
       
       // create the bar chart widget
       this.chart = new Chart( this.domNode );
@@ -92,7 +92,7 @@ function( declare,
 		     max: i + step,
 		     count: 0} );
       }
-      console.log( "Histogram: finished creating bins..." );
+      //console.log( "Histogram: finished creating bins..." );
       
       // bin the data from the view
       var self = this;
@@ -101,7 +101,7 @@ function( declare,
 	var item = row.value;
 	count = count + 1;
 	if( count % 100 == 0 ) {
-	  console.log( "histogram: binned " + count + " items" );
+	  //console.log( "histogram: binned " + count + " items" );
 	}
 	//console.log( "  stream item: " + dojo.toJson( item ) );
 	for( var i = 0; i < bins.length; ++i ) {
@@ -116,7 +116,7 @@ function( declare,
 	//console.log( "RES: " + dojo.toJson(res) );
 	//console.log( "BINS: " + dojo.toJson( bins ) );
 	
-	console.log( "Histogram: binned data" );
+	//console.log( "Histogram: binned data" );
 	
 	// convert form bins to histogram data (x,y)
 	for( var i = 0; i < bins.length; ++i ) {
@@ -128,11 +128,11 @@ function( declare,
 	
 	// add teh data
 	self.chart.addSeries( self.series_title, hist_data );
-	console.log( "histogram: added series" );
+	//console.log( "histogram: added series" );
 	
 	// render hte chart
 	self.chart.render();
-	console.log( "Histogram: calling render()" );
+	//console.log( "Histogram: calling render()" );
       });
     },
 

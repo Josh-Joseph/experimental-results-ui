@@ -41,7 +41,7 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
 	var changes_view = this.view.substring( this.view.indexOf( "_design" ) + 7 + 1 );
 	var temp = changes_view.substring( 0, changes_view.indexOf( "/") );
 	changes_view = temp + "/" + changes_view.substring( changes_view.indexOf( "_view" ) + 5 + 1 );
-	console.log( "changes_view: " + changes_view );
+	//console.log( "changes_view: " + changes_view );
 	this.event_source = 
       	  new EventSource( this.target 
       			   + "_changes?" 
@@ -228,7 +228,7 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
       //         iterative methods.
       options = options || {};
 
-      console.log( "QUERY: " + dojo.toJson( query ) + " | " + dojo.toJson( options ) );
+      //console.log( "QUERY: " + dojo.toJson( query ) + " | " + dojo.toJson( options ) );
 
       var headers = lang.mixin({ Accept: this.accepts }, 
 			       this.headers, 
@@ -291,7 +291,7 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
 	  d.total = d.length;
 	}
 	//console.log( "RESULT: " + JSON.stringify( d ) );
-	console.log( "couchdb::query (" + self.target + self.view + (query || "") + ") retuning results (total=" + d.total + ")" );
+	//console.log( "couchdb::query (" + self.target + self.view + (query || "") + ") retuning results (total=" + d.total + ")" );
 	if( d.total < 10 ) {
 	  //console.log( "couchdb::query res= " + JSON.stringify( res ) );
 	  //console.log( "couchdb::query url= " + this.target + this.view + (query || "") );
@@ -313,19 +313,19 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
       
       var change = JSON.parse( change_string.data );
       //console.log( "[" + this.event_source.url + "] _change_notify: " + JSON.stringify( row ) );
-      console.log( "_change_notify: " + JSON.stringify( change ) );
+      //console.log( "_change_notify: " + JSON.stringify( change ) );
       
       var rev = change.changes[0].rev;
       var deleted = change.deleted;
       var obj = change.doc;
       if( deleted ) {
-	console.log( "  -- notify( null, " + change.id + ") " );
+	//console.log( "  -- notify( null, " + change.id + ") " );
 	self_store.notify( null, change.id );
       } else if( rev.substring( 0, rev.indexOf( "-" ) ) == "1" ) {
-	console.log( "  -- notify( obj, null ) " );
+	//console.log( "  -- notify( obj, null ) " );
 	self_store.notify( obj, null );
       } else {
-	console.log( "  -- notify( obj, " + change.id + " )" );
+	//console.log( "  -- notify( obj, " + change.id + " )" );
 	self_store.notify( obj, change.id );
       }
     }
