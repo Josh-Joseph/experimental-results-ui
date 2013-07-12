@@ -28,6 +28,8 @@
 	     "erf-ui-common/ClusterDetailPanel",
 	     "erf-ui-common/CouchdbStore",
 	     "erf-ui-common/Histogram",
+	     "erf-ui-common/StoreManager",
+	     "erf-ui-common/ExploratoryPlotPanel",
 	     "dojo/domReady!"],
 	  
     function(registry, BorderContainer, TabContainer, ContentPane, ioQuery,
@@ -36,7 +38,9 @@
 	     StoreBackedTabContainer,
 	     ClusterDetailPanel,
 	     CouchdbStore,
-	     Histogram ){
+	     Histogram,
+	     StoreManager,
+	     ExploratoryPlotPanel){
 
       console.log( "erfConfig: " + dojo.toJson( erfConfig ) );
 	
@@ -149,12 +153,12 @@
 
       // add a histogram as the right child
       appLayout.addChild(
-	new Histogram({
-	  region: "right",
-	  splitter: true,
+      	new Histogram({
+      	  region: "right",
+      	  splitter: true,
       	  min: 40,
       	  max: 60,
-	  num_bins: 100,
+      	  num_bins: 100,
       	  //batch_size: 500,
       	  database: erfConfig.local_results_database_url,
       	  view: "_design/sandbox/_view/rereduce_count",
@@ -162,6 +166,18 @@
       		   group: false },
       	  series_title: "Testing"
       	}));
+
+      // create a store mamanger and get all the views for local
+      var store_manager = new StoreManager();
+      store_manager.add_all_databases( "http://localhost:5984/" ).then(function(views){
+	
+	// add a new tab with an exploratory plot widget
+	contentTabs.addChild( new ExploratoryPlotPanel({
+	  store_manager: store_manager,
+	  title: "Plot Local Views",
+	}));
+
+      });
       
       
       // start up anbd do layout

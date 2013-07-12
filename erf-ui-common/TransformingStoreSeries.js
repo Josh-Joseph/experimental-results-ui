@@ -19,7 +19,7 @@ function(arr, declare, Deferred, misc){
   return declare( null, {
     
     //
-    // Creates a new TransfomringStoreSeries.
+    // Creates a new TransformingStoreSeries.
     // This is a data series backed by a potentially Observable
     // Store instance that allows for a user function to
     // transform the data from the series to the data for
@@ -39,7 +39,8 @@ function(arr, declare, Deferred, misc){
     constructor: function(store, query, transform, options){
       declare.safeMixin( this, options );
       this.store = store;
-      this.kwArgs = kwArgs;
+      this.query = query;
+      this.kwArgs = options;
       this.transform = transform;
       this.data = [];
       this._initialRendering = false;
@@ -49,6 +50,10 @@ function(arr, declare, Deferred, misc){
     //
     // The delay in millesoncds to throttle updates from the store
     throttle_delay: 1000,
+    
+    // 
+    // the data
+    data: [],
     
     destroy: function(){
       // summary:
@@ -75,22 +80,25 @@ function(arr, declare, Deferred, misc){
       if(this.observeHandle){
 	this.observeHandle.remove();
       }
-      var results = this.store.query(this.kwArgs.query, this.kwArgs);
+      var results = this.store.query(this.query, this.kwArgs);
       Deferred.when(results, function(objects){
 	self.objects = objects;
 	update();
       });
       if(results.observe){
-	this.observeHandle = results.observe( misc.util.throttleDelayed(self.fetch, this.throttle_delay), false);
+	this.observeHandle = results.observe( misc.throttleDelayed(self.fetch, this.throttle_delay), false);
       }
       function update(){
+	//console.log( "TSeries: objects: " + dojo.toJson( self.objects ) );
 	self.data = self.transform( self.objects );
+	console.log( "TSeries: transform done! data length: " + self.data.length);
 	self._pushDataChanges();
       }
     },
     
     _pushDataChanges: function(){
       if(this.series){
+	console.log( "TSeries: pushing change!" );
 	this.series.chart.updateSeries(this.series.name, this, this._initialRendering);
 	this._initialRendering = false;
 	this.series.chart.delayedRender();
