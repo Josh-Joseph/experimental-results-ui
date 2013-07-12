@@ -12,6 +12,7 @@ define([
   "dijit/layout/ContentPane",
   "dijit/form/Select",
   "dijit/form/Button",
+  "dojox/charting/widget/Chart",
   "dojox/charting/Chart",
   "dojox/charting/plot2d/Bars",
   "dojox/charting/plot2d/Lines",
@@ -27,6 +28,7 @@ define([
 	   ContentPane,
 	   Select,
 	   Button,
+	   ChartWidget,
 	   Chart,
 	   BarsPlot,
 	   LinesPlot,
@@ -157,9 +159,13 @@ define([
        
        // create the chart and it's panel
        var chart_panel = new ContentPane({
-	 region: "center"
+	 region: "center",
+	 style: "padding: 30px",
        });
-       var chart = new Chart( chart_panel.domNode );
+       var chart_widget = new ChartWidget({});
+       chart_widget.margins = { l:20, t:20, r:20, b:20 };
+       var chart = new Chart( chart_widget.domNode );
+       chart_panel.addChild( chart_widget );
 
        // add the panels to this layout
        self.addChild( selects_panel );
@@ -199,7 +205,7 @@ define([
 	 
 	 // createa a new chart
 	 chart.destroy();
-	 chart = new Chart( chart_panel.domNode );
+	 chart = new Chart( chart_widget.domNode );
 	 chart.setTheme( theme );
 	 chart.addPlot( "default", {
 	   type: LinesPlot,
