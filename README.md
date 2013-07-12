@@ -1,43 +1,29 @@
 experimental-results-ui
 =======================
 
-This repo includes all of the html and javascript that is run on the client-side of the UI. This does not include the couchdb views but uses them.
+The purpose of this codebase is to:
 
-Getting couchdb running:
-------------------------
+1. Start/monitor distributed jobs from the experimental results framework through a UI
+2. Graphical/interactive views the results from the jobs
 
-To get the UI running and test it:
 
-    sudo apt-get install help2man make gcc zlib1g-dev libssl-dev rake help2man texinfo flex dctrl-tools libsctp-dev libxslt1-dev libcap2-bin ed
+Required Packages:
+-----------------
 
-    sudo pip install couchdb gitpython
-    
-    git clone git://github.com/iriscouch/build-couchdb.git
-    
-    cd build-couchdb/
-    
-    rake
-    
-    setup build-couchdb/builb/etc/couchdb/local.ini as described in the README.md of https://github.com/josh00/experimental-results-framework-couchdb
+* Jetty 9 from http://download.eclipse.org/jetty/stable-9/dist/
+* openjdk-7 (apt-get install openjdk-7-jdk openjdk-7-jre )
+* dojo 1.9.0:  http://download.dojotoolkit.org/release-1.9.0/dojo-release-1.9.0-src.tar.gz
 
-Start up (and leave running) couch db
 
-    build-couchdb/build/bin/couchdb
-    
+Webapps and Jetty:
+-----------------
 
-Generating fake results:
-------------------------
-    
-Put fake results into the database
+Jetty, by default, will take anything inside of the webapps folder and use it as a static content page.
+This folder is scanned by jetty as it runs for hot-plug contents.
+So we just create a folder inside of webapps and copy in all of the dojo sources as well as make a subfolder for our own UI sources and we are set.
+The webapp/<folder>will be at url localhost:8080/<folder>.
 
-    git clone git@github.com:josh00/experimental-results-framework.git
 
-    cd experimental-results-framework/fake-results-generator/
-
-    python generate_fake_results.py --num-trials 200
-    
-To view the fake results, in a browser open http://localhost:5984/_utils/
-    
 Starting up jetty:
 ------------------
 
