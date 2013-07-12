@@ -1,7 +1,10 @@
 experimental-results-ui
 =======================
 
-This repo includes all of the html and javascript that is run on the client-side of the UI. This does not include the couchdb views but uses them.
+The purpose of this codebase is to:
+
+1. Start/monitor distributed jobs from the experimental results framework through a UI
+2. Graphical/interactive views the results from the jobs
 
 
 Required Packages:
