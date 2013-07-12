@@ -132,7 +132,6 @@ function(declare,
       // Once we have the results, create a tab for each element
       var self = this;
       results.forEach( function( obj ) {
-	console.log( "Cluster  object: " + obj.value.cluster.hostname );
 	self._addNewTab( obj );
       });
 	
