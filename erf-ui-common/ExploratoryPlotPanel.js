@@ -46,8 +46,13 @@ define([
      // THe options are mixed in.
      // You must supply at least the following:
      //    store_manager : StoreManager instance with the stores to use
-     //    transforms : List of { name: "", transform: function } with
-     //                 functions to be given to a TransformingStoreSeries
+     //    transform_manager : TransformManager instance with the transforms
+     //                        known. Additionally, the tags "single_axis" and
+     //                        "global_axis" are treated special, where 
+     //                        single_axis denotes a transform that returns
+     //                        only a single axis of hte data, and global_axis
+     //                        is treated as a tranform that returns all of the 
+     //                        axes for the data.
      constructor: function( options ) {
        declare.safeMixin( this, options );
      },
@@ -55,6 +60,10 @@ define([
      //
      // The store manager
      store_manager: undefined,
+
+     //
+     // THe transform manager
+     transform_manager: undefined,
      
      //
      // The set of transform functions and names
@@ -172,9 +181,10 @@ define([
        self.addChild( chart_panel );
        
        // Ok, now populate the transforms select
-       for( var i = 0; i < this.transforms.length; ++i ) {
-	 var tfunc = this.transforms[i].transform;
-	 var tname = this.transforms[i].name;
+       var transforms = this.transform_manager.get_transforms();
+       for( var i = 0; i < transforms.length; ++i ) {
+	 var tfunc = transforms[i].transform;
+	 var tname = transforms[i].name;
 	 transform_select.addOption({
 	   value: tfunc,
 	   label: tname 

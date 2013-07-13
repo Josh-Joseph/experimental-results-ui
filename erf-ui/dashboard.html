@@ -29,6 +29,7 @@
 	     "erf-ui-common/CouchdbStore",
 	     "erf-ui-common/Histogram",
 	     "erf-ui-common/StoreManager",
+	     "erf-ui-common/TransformManager",
 	     "erf-ui-common/ExploratoryPlotPanel",
 	     "dojo/domReady!"],
 	  
@@ -40,6 +41,7 @@
 	     CouchdbStore,
 	     Histogram,
 	     StoreManager,
+	     TransformManager,
 	     ExploratoryPlotPanel){
 
       console.log( "erfConfig: " + dojo.toJson( erfConfig ) );
@@ -167,6 +169,29 @@
       	  series_title: "Testing"
       	}));
 
+      // creat ea transform nmanager and add some hardoced transforms for now
+      var transform_manager = new TransformManager();
+      transform_manager.add_transform( function(rows) {
+	var data = [];
+	for( var i = 0; i < rows.length; ++i ) {
+	  data.push({
+	    x: i,
+	    y: rows[i].value
+	  });
+	}
+	return data;
+      }, "index X value", ["global_axis"] );
+      transform_manager.add_transform( function(rows) {
+	var data = [];
+	for( var i = 0; i < rows.length; ++i ) {
+	  data.push({
+	    x: i,
+	    y: rows[i].value.mean
+	  });
+	}
+	return data;
+      }, "index X mean", ["global_axis"] );
+
       // create a store mamanger and get all the views for local
       var store_manager = new StoreManager();
       store_manager.add_all_databases( "http://localhost:5984/" ).then(function(views){
@@ -174,6 +199,7 @@
 	// add a new tab with an exploratory plot widget
 	contentTabs.addChild( new ExploratoryPlotPanel({
 	  store_manager: store_manager,
+	  transform_manager: transform_manager,
 	  title: "Plot Local Views",
 	}));
 
