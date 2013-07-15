@@ -34,8 +34,10 @@ function( declare,
       //console.log( "StoreManager: adding store: " + dojo.toJson(store) + " TAGS: " + dojo.toJson( tags ) );
       this._known_stores.push({
 	store: store,
-	tags: tags
+	tags: tags || []
       });
+      
+      return this._known_stores.length - 1;
     },
 
     //
@@ -63,6 +65,70 @@ function( declare,
 	}
       return res;      
     },
+
+
+    //
+    // Fetch a particular store for a particular view.
+    // If it is not already in the manager, add it to the manager
+    // with the given teags, otherwise return the store already
+    // in the manager.
+    // Also, update the store to include the given tags along with
+    // any previous tags it had
+    //
+    // Arguments:
+    //    view_options : object with at least:
+    //        { view:                 String, the view for the databse 
+    //          target:               String, databse url,
+    //          enable_event_source:  Boolean Optional, if set then the store
+    //                                must have the event source enabled or not 
+    //        }
+    //    store_options_if_new: object to use to create the store
+    //        if not already created. Will be passed to CouchdbStore constructor
+    //    ensure_tags: Array of String.  Will ensure that the store has these
+    //        tags even if hte store already existed in the manager
+    get_view_store: function( view_options,
+			      store_options_if_new,
+			      ensure_tags ) {
+      
+      var self = this;
+      
+      // see if the store already exists in the manager
+      var store_info_index = null;
+      for( var i = 0; i < self._known_stores; ++i ) {
+	var info = self._known_stores[i];
+	if( info.store.target == view_options.target &&
+	    info.store.view == view_options.view ) {
+	  
+	  // check for event source if required
+	  if( view_options.enable_event_source &&
+	      info.store.enable_event_source 
+	      != view_options.enable_event_source ) {
+	    continue;
+	  }
+	  
+	  
+	  // foudn it!
+	  store_info_index = i;
+	  
+	  // ensure that the tags are there
+	  info.tags = info.tags.concat( ensure_tags || [] );
+	  
+	  // get out of loop early
+	  break;
+	}
+      }
+
+      // if we did not find the store, add it
+      if( store_info_index == null ) {
+	var store = new CouchdbStore( store_options_if_new );
+	store_info_index = self.add_store( store, ensure_tags );
+      }
+
+      // Ok, return the store
+      return self._known_stores[ store_info_index ].store;
+      
+    },
+    
 
 
     //

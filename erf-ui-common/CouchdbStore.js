@@ -124,7 +124,11 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
 	handleAs: "json",
 	headers: headers
       });
-      return res.rows[0];
+      if( res.rows.length > 0 ) {
+	return res.rows[0];
+      } else {
+	return null;
+      }
     },
 
     // accepts: String
@@ -141,9 +145,6 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
     },
 
     put: function(object, options){
-      // TODO: implement this
-      //       right now this is WRONG (just copied from JsonRest)
-      console.log( "CouchdbStore::put called!" );
       // summary:
       //		Stores an object. This will trigger a PUT request 
       //         to the server
@@ -171,10 +172,6 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
     },
 
     add: function(object, options){
-      // TODO: implement this
-      //       right now this is WRONG (just copied from JsonRest)
-      console.log( "CouchdbStore::add called!" );
-
       // summary:
       //		Adds an object. This will trigger a PUT request to 
       //         the server
@@ -193,7 +190,7 @@ function(xhr, lang, JSON, declare, QueryResults, Observable, ioQuery ){
 
     remove: function(id, options){
       // TODO: implement this
-      //       right now this is WRONG (just copied from JsonRest)
+      //       right now this is UNTESTED at ALL
 
       // summary:
       //		Deletes an object by its identity. This will 
